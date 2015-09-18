@@ -60,7 +60,8 @@ addon.
 
 http://chrispederick.com/work/user-agent-switcher/
 
-This list is organized into reasonably easy to navigate 
+This list is organized into reasonably easy to navigate sections and 
+sub-sections. See below for basic structure.
 
 Very useful to test the browser detection script as well.
 
@@ -97,7 +98,7 @@ UserAgent Switcher extension.
 
 ---------------------------------------------------------------
 
-Current (2015-09-18) Organization:
+Current (2015-09-18) Layout/Structure:
 
 Main categories:
 
