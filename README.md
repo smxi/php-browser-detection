@@ -4,7 +4,7 @@ These tools/utilities are available at github and on the listed primary pages.
 
 Version Control: https://github.com/smxi/php-browser-detection
 
-=============================================================================
+==========================================================
 
 browser_detection.inc
 
@@ -25,7 +25,7 @@ There are a lot of browser detection scripts out there, some absurdly bloated
 and inefficient (all we're doing is parsing the useragent string the server
 returns, after all), others too simple, and prone to errors in detection.
 
-=============================================================================
+==========================================================
 
 language_detection.inc
 
@@ -44,7 +44,7 @@ Returns an array of the following 4 item array for each language the os supports
 Easy to use, easy to implement, works well in conjunction with the browser
 detection utility.
 
-=============================================================================
+==========================================================
 
 useragents.xml
 
