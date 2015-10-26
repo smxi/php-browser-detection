@@ -812,7 +812,7 @@
 	</folder>
 	<folder description="UA List :: About">
 		<useragent description="User Agent List :: version: 2.6.0" useragent="" appcodename="" appname="" appversion="" platform="" vendor="http://techpatterns.com/forums/about304.html" vendorsub=""/>
-		<useragent description="Last Updated: 2015-09-21" useragent="" appcodename="" appname="" appversion="" platform="" vendor="http://techpatterns.com/forums/about304.html" vendorsub=""/>
+		<useragent description="Last Updated: 2015-10-26" useragent="" appcodename="" appname="" appversion="" platform="" vendor="http://techpatterns.com/forums/about304.html" vendorsub=""/>
 		<useragent description="Copyright (c) 2015, Harald Hope" useragent="" appcodename="" appname="" appversion="" platform="" vendor="" vendorsub=""/>
 		<useragent description="License: BSD 2 Clause" useragent="" appcodename="" appname="" appversion="" platform="" vendor="Copyright (c) 2015, Harald Hope
 		All rights reserved. Redistribution and use in source and binary forms, 
