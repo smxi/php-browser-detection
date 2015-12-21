@@ -505,7 +505,10 @@ function browser_detection( $which_test, $test_excludes='', $external_ua_string=
 					agent version, ie, webkit 583, not chrome 0.3
 					**/
 					case 'blink':
-						// note that this is the Webkit version number
+						// to get full number
+						if ( $browser_name == 'opr/' ){
+							get_set_count( 'set', 0 );
+						}
 						$browser_number = get_item_version( $browser_user_agent, $browser_name );
 						// assign rendering engine data
 						$layout_engine = 'blink';
@@ -521,8 +524,14 @@ function browser_detection( $which_test, $test_excludes='', $external_ua_string=
 						for ( $j = 0; $j < $j_count; $j++ ) {
 							if ( strstr( $browser_user_agent, $a_blink_types[$j] ) ) {
 								$blink_type = $a_blink_types[$j];
+								if ( $browser_name == 'opr/' ){
+									get_set_count( 'set', 0 );
+								}
 								$blink_type_number = get_item_version( $browser_user_agent, $blink_type );
 								$browser_name = $a_blink_types[$j];
+								if ( $browser_name == 'opr/' ){
+									get_set_count( 'set', 0 );
+								}
 								$browser_number = get_item_version( $browser_user_agent, $browser_name );
 								break;
 							}
@@ -1196,8 +1205,7 @@ function get_item_version( $pv_browser_user_agent, $pv_search_string, $pv_b_brea
 				break;
 			}
 		}
-		else
-		{
+		else {
 			break;
 		}
 	}
@@ -1205,12 +1213,11 @@ function get_item_version( $pv_browser_user_agent, $pv_search_string, $pv_b_brea
 	Handles things like extra omniweb/v456, gecko/, blackberry9700
 	also corrects for the omniweb 'v'
 	**/
+	
 	$start_pos += get_set_count( 'get' );
 	$string_working_number = substr( $pv_browser_user_agent, $start_pos, $substring_length );
-	
 	// Find the space, ;, or parentheses that ends the number
 	$string_working_number = substr( $string_working_number, 0, strcspn($string_working_number, ' );/') );
-	
 	//make sure the returned value is actually the id number and not a string
 	// otherwise return ''
 	// strcspn( $string_working_number, '0123456789.') == strlen( $string_working_number)
