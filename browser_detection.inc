@@ -459,7 +459,7 @@ function browser_detection( $which_test, $test_excludes='', $external_ua_string=
 		//array( '', false ); // browser array template
 		// note: not using this because chrome < 28 = webkit, >=28 == blink, so can't do normal handling
 		// for now doing a case by case for layout engine
-		$a_blink_types = array('opr/', 'vivaldi', 'chrome', 'chromium', 'blink');
+		$a_blink_types = array('opr/', 'vivaldi', 'chromium', 'chrome', 'blink');
 		/**
 		moz types array
 		note the order, netscape6 must come before netscape, which  is how netscape 7 id's itself.
