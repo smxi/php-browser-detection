@@ -314,7 +314,7 @@
 		<useragent description="Shadowfox 7.0 (Mozilla)" useragent="Mozilla/5.0 (X11; U; Linux x86_64; us; rv:1.9.1.19) Gecko/20110430 shadowfox/7.0 (like Firefox/7.0" appcodename="" appname="" appversion="" platform="" vendor="" vendorsub=""/>
 		<useragent description="Swiftfox 3.6.3" useragent="Mozilla/5.0 (X11; U; Linux i686; it; rv:1.9.2.3) Gecko/20100406 Firefox/3.6.3 (Swiftfox)" appcodename="" appname="" appversion="" platform="" vendor="" vendorsub=""/>
 		<useragent description="Uzbl (Webkit 1.3)" useragent="Uzbl (Webkit 1.3) (Linux i686 [i686])" appcodename="" appname="" appversion="" platform="" vendor="" vendorsub=""/>
-		<useragent description="Vivaldi 1.0.344 (Blink) (Webkit 1.3)" useragent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.80 Safari/537.36 Vivaldi/1.0.344.37" appcodename="" appname="" appversion="" platform="" vendor="" vendorsub=""/>
+		<useragent description="Vivaldi 1.0.344 (Blink) (Webkit 537.36)" useragent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.80 Safari/537.36 Vivaldi/1.0.344.37" appcodename="" appname="" appversion="" platform="" vendor="" vendorsub=""/>
 	</folder>
 	<folder description="Browsers - Unix">
 		<folder description="Console Browsers">
