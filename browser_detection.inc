@@ -358,7 +358,8 @@ function browser_detection( $which_test, $test_excludes='', $external_ua_string=
 		array( 'msie', true, 'ie', 'bro' ),
 		array( 'trident', true, 'ie', 'bro' ),
 		// opera blink: OPR/<number>, no opera in ua
-		array( 'opr/', true, 'op', 'bro' ),
+		array( 'opr/', true, 'blink', 'bro' ),
+		array( 'vivaldi', true, 'blink', 'bro' ),
 		// webkit before gecko because some webkit ua strings say: like gecko
 		// and before khtml because some still use khtml with webkit
 		array( 'webkit', true, 'webkit', 'bro' ),
@@ -471,7 +472,7 @@ function browser_detection( $which_test, $test_excludes='', $external_ua_string=
 		Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.<OS build number>
 		edge must come before chrome
 		**/
-		$a_webkit_types = array( 'arora', 'bolt', 'beamrise', 'chromium', 'puffin', 'edge', 'vivaldi', 'chrome', 'crios', 'dooble', 'epiphany', 'gtklauncher', 'icab', 'konqueror', 'maxthon',  'midori', 'omniweb', 'opera', 'qupzilla', 'rekonq', 'rocketmelt', 'samsungbrowser', 'silk', 'uzbl', 'ucbrowser', 'ucweb', 'shiira', 'sputnik', 'steel', 'teashark', 'safari',  'applewebkit', 'webos', 'xxxterm', 'webkit' );
+		$a_webkit_types = array( 'arora', 'bolt', 'beamrise', 'chromium', 'puffin', 'edge', 'chrome', 'crios', 'dooble', 'epiphany', 'gtklauncher', 'icab', 'konqueror', 'maxthon',  'midori', 'omniweb', 'opera', 'qupzilla', 'rekonq', 'rocketmelt', 'samsungbrowser', 'silk', 'uzbl', 'ucbrowser', 'ucweb', 'shiira', 'sputnik', 'steel', 'teashark', 'safari',  'applewebkit', 'webos', 'xxxterm','vivaldi', 'webkit' );
 		/**
 		run through the browser_types array, break if you hit a match, if no match, assume old browser
 		or non dom browser, assigns false value to $b_success.
@@ -498,6 +499,37 @@ function browser_detection( $which_test, $test_excludes='', $external_ua_string=
 					case 'ns':
 						$b_safe_browser = false;
 						$browser_number = get_item_version( $browser_user_agent, 'mozilla' );
+						break;
+					/**
+					note: webkit returns always the webkit version number, not the specific user
+					agent version, ie, webkit 583, not chrome 0.3
+					**/
+					case 'blink':
+						// note that this is the Webkit version number
+						$browser_number = get_item_version( $browser_user_agent, $browser_name );
+						// assign rendering engine data
+						$layout_engine = 'blink';
+						if ( strstr($browser_user_agent, 'blink') ) {
+							$layout_engine_nu_full = get_item_version( $browser_user_agent, 'blink' );
+						}
+						else {
+							$layout_engine_nu_full = get_item_version( $browser_user_agent, 'webkit' );
+						}
+						$layout_engine_nu = get_item_math_number( $browser_number );
+						// this is to pull out specific webkit versions, safari, google-chrome etc..
+						$j_count = count( $a_blink_types );
+						for ( $j = 0; $j < $j_count; $j++ ) {
+							if ( strstr( $browser_user_agent, $a_blink_types[$j] ) ) {
+								$blink_type = $a_blink_types[$j];
+								$blink_type_number = get_item_version( $browser_user_agent, $blink_type );
+								$browser_name = $a_blink_types[$j];
+								$browser_number = get_item_version( $browser_user_agent, $browser_name );
+								break;
+							}
+						}
+						if ( $browser_name == 'opr/' ){
+							$browser_name = 'opera';
+						}
 						break;
 					case 'dillo':
 						$browser_number = get_item_version( $browser_user_agent, $browser_name );
