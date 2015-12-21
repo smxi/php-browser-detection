@@ -3,8 +3,8 @@
 Script Name: Full Featured PHP Browser/OS detection
 Author: Harald Hope, Website: http://techpatterns.com/
 Script Source URI: http://techpatterns.com/downloads/php_browser_detection.php
-Version: 5.6.4
-Date: 2015-07-30
+Version: 5.6.5
+Date: 2015-12-21
 Copyright (C) 2003-2015
 
 Special thanks to alanjstr for cleaning up the code, especially on function get_item_version(),
@@ -354,6 +354,7 @@ function browser_detection( $which_test, $test_excludes='', $external_ua_string=
 		**/
 		// known browsers, list will be updated routinely, check back now and then
 		$a_browser_types = array(
+		array( 'edge', true, 'edge', 'bro' ),
 		array( 'msie', true, 'ie', 'bro' ),
 		array( 'trident', true, 'ie', 'bro' ),
 		// opera blink: OPR/<number>, no opera in ua
@@ -445,7 +446,7 @@ function browser_detection( $which_test, $test_excludes='', $external_ua_string=
 		//array( '', false ); // browser array template
 		// note: not using this because chrome < 28 = webkit, >=28 == blink, so can't do normal handling
 		// for now doing a case by case for layout engine
-		$a_blink_types = array('chrome', 'opr/');
+		$a_blink_types = array('opr/', 'vivaldi');
 		/**
 		moz types array
 		note the order, netscape6 must come before netscape, which  is how netscape 7 id's itself.
@@ -470,7 +471,7 @@ function browser_detection( $which_test, $test_excludes='', $external_ua_string=
 		Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.<OS build number>
 		edge must come before chrome
 		**/
-		$a_webkit_types = array( 'arora', 'bolt', 'beamrise', 'chromium', 'puffin', 'edge', 'chrome', 'crios', 'dooble', 'epiphany', 'gtklauncher', 'icab', 'konqueror', 'maxthon',  'midori', 'omniweb', 'opera', 'qupzilla', 'rekonq', 'rocketmelt', 'samsungbrowser', 'silk', 'uzbl', 'ucbrowser', 'ucweb', 'shiira', 'sputnik', 'steel', 'teashark', 'safari',  'applewebkit', 'webos', 'xxxterm', 'webkit' );
+		$a_webkit_types = array( 'arora', 'bolt', 'beamrise', 'chromium', 'puffin', 'edge', 'vivaldi', 'chrome', 'crios', 'dooble', 'epiphany', 'gtklauncher', 'icab', 'konqueror', 'maxthon',  'midori', 'omniweb', 'opera', 'qupzilla', 'rekonq', 'rocketmelt', 'samsungbrowser', 'silk', 'uzbl', 'ucbrowser', 'ucweb', 'shiira', 'sputnik', 'steel', 'teashark', 'safari',  'applewebkit', 'webos', 'xxxterm', 'webkit' );
 		/**
 		run through the browser_types array, break if you hit a match, if no match, assume old browser
 		or non dom browser, assigns false value to $b_success.
@@ -497,6 +498,20 @@ function browser_detection( $which_test, $test_excludes='', $external_ua_string=
 					case 'ns':
 						$b_safe_browser = false;
 						$browser_number = get_item_version( $browser_user_agent, 'mozilla' );
+						break;
+					case 'dillo':
+						$browser_number = get_item_version( $browser_user_agent, $browser_name );
+						// assign rendering engine data
+						$layout_engine = 'dillo';
+						$layout_engine_nu = get_item_math_number( $browser_number );
+						$layout_engine_nu_full = $browser_number;
+						break;
+					case 'edge':
+						$browser_number = get_item_version( $browser_user_agent, $browser_name );
+						// assign rendering engine data
+						$layout_engine = 'edgehtml';
+						$layout_engine_nu = get_item_math_number( $browser_number );
+						$layout_engine_nu_full = $browser_number;
 						break;
 					case 'khtml':
 						// note that this is the KHTML version number
@@ -1391,6 +1406,7 @@ function get_html_level( $pv_render_engine, $pv_render_engine_nu )
 	**/
 	$a_html5_basic = array(
 	'blink' => 10,
+	'edgehtml' => 4,
 	'gecko' => 20,
 	'khtml' => 45,
 	'presto' => 20, // 26
@@ -1399,6 +1415,7 @@ function get_html_level( $pv_render_engine, $pv_render_engine_nu )
 	);
 	$a_html5_forms = array(
 	'blink' => 10,
+	'edgehtml' => 4,
 	'gecko' => 20,
 	'khtml' => 50,
 	'presto' => 20, // 28
