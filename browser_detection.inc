@@ -3,7 +3,7 @@
 Script Name: Full Featured PHP Browser/OS detection
 Author: Harald Hope, Website: http://techpatterns.com/
 Script Source URI: http://techpatterns.com/downloads/php_browser_detection.php
-Version: 5.6.5
+Version: 5.7.0
 Date: 2015-12-21
 Copyright (C) 2003-2015
 
@@ -65,6 +65,7 @@ full - returns this array, listed by array index number:
   [16] - $html_type
   [17] - $a_engine_data
   [18] - $a_trident_data
+  [19] - $a_blink_data
    
 full_assoc - returns all relevant browser information in an associative array, same as above
              only with string indexes instead of numeric.
@@ -86,7 +87,8 @@ full_assoc - returns all relevant browser information in an associative array, s
   ['run_time'] - $run_time,
   ['html_type'] - $html_type,
   ['engine_data'] - $a_engine_data,
-  ['trident_data'] - $a_trident_data
+  ['trident_data'] - $a_trident_data,
+  ['blink_data'] - $a_blink_data
 
 ******************************************************************************
 ALPHABETICAL DESCRIPTION OF DATA OPTIONS (With 'full' numeric index key first)
@@ -100,6 +102,12 @@ ALPHABETICAL DESCRIPTION OF DATA OPTIONS (With 'full' numeric index key first)
   $a_browser_data = browser_detection('full');
   $a_browser_data[9]
 ******************************************************************************
+[19] ['blink_data'] - returns array of blink (chrome > 28.0 engine) browser data.
+     Return Array listed by index number:
+       [0] - $blink_type [blink version name (Eg. vivaldi)]
+       [1] - $blink_type_number [blink version number (Eg. Vivaldi 1.0.194)]
+       [2] - $layout_engine_number [the actual blink version number (NOTE: no reliable way to get this)]
+       [3] - $browser_number [the actual browser version number (Eg. Vivaldi 1.0.194)]
 [9]  ['browser_math_number'] - [deprecated: 'math_number'] returns basic version number, for math
      comparison, ie. 1.2rel2a becomes 1.2. If browser_number is null, browser_math_number = ''
 [7]  ['browser_name'] - returns the full browser name string, if available, otherwise returns ''
@@ -244,7 +252,7 @@ function browser_detection( $which_test, $test_excludes='', $external_ua_string=
 	*/
 	script_time(); // set script timer to start timing
 	
-	static $a_full_assoc_data, $a_khtml_data, $a_mobile_data, $a_moz_data, $a_engine_data, $a_trident_data, $a_webkit_data, $b_dom_browser, $b_repeat, $b_safe_browser, $browser_name, $browser_number, $browser_math_number, $browser_user_agent, $browser_working, $html_type, $ie_version, $khtml_type, $khtml_type_number, $mobile_test, $moz_type_number, $moz_rv, $moz_rv_full, $moz_release_date, $moz_type, $os_number, $os_type, $layout_engine, $layout_engine_nu, $layout_engine_nu_full, $trident_type, $trident_type_number, $true_ie_number, $ua_type, $webkit_type, $webkit_type_number;
+	static $a_full_assoc_data, $a_khtml_data, $a_mobile_data, $a_moz_data, $a_engine_data, $a_blink_data, $a_trident_data, $a_webkit_data, $b_dom_browser, $b_repeat, $b_safe_browser, $blink_type, $blink_type_number, $browser_name, $browser_number, $browser_math_number, $browser_user_agent, $browser_working, $html_type, $ie_version, $khtml_type, $khtml_type_number, $mobile_test, $moz_type_number, $moz_rv, $moz_rv_full, $moz_release_date, $moz_type, $os_number, $os_type, $layout_engine, $layout_engine_nu, $layout_engine_nu_full, $trident_type, $trident_type_number, $true_ie_number, $ua_type, $webkit_type, $webkit_type_number;
 	
 	// switch off the optimization for external ua string testing.
 	if ( $external_ua_string ) {
@@ -257,6 +265,7 @@ function browser_detection( $which_test, $test_excludes='', $external_ua_string=
 	**/
 	if ( !$b_repeat ) {
 		//initialize all variables with default values to prevent error
+		$a_blink_data = '';
 		$a_browser_math_number = '';
 		$a_full_assoc_data = '';
 		$a_full_data = '';
@@ -272,6 +281,8 @@ function browser_detection( $which_test, $test_excludes='', $external_ua_string=
 		$b_mobile_test = true;
 		$b_safe_browser = false;
 		$b_success = false;// boolean for if browser found in main test
+		$blink_type = '';
+		$blink_type_number = '';
 		$browser_math_number = '';
 		$browser_temp = '';
 		$browser_working = '';
@@ -357,6 +368,7 @@ function browser_detection( $which_test, $test_excludes='', $external_ua_string=
 		array( 'edge', true, 'edge', 'bro' ),
 		array( 'msie', true, 'ie', 'bro' ),
 		array( 'trident', true, 'ie', 'bro' ),
+		array( 'blink', true, 'blink', 'bro' ),
 		// opera blink: OPR/<number>, no opera in ua
 		array( 'opr/', true, 'blink', 'bro' ),
 		array( 'vivaldi', true, 'blink', 'bro' ),
@@ -447,7 +459,7 @@ function browser_detection( $which_test, $test_excludes='', $external_ua_string=
 		//array( '', false ); // browser array template
 		// note: not using this because chrome < 28 = webkit, >=28 == blink, so can't do normal handling
 		// for now doing a case by case for layout engine
-		$a_blink_types = array('opr/', 'vivaldi');
+		$a_blink_types = array('opr/', 'vivaldi', 'chrome', 'chromium', 'blink');
 		/**
 		moz types array
 		note the order, netscape6 must come before netscape, which  is how netscape 7 id's itself.
@@ -907,17 +919,20 @@ function browser_detection( $which_test, $test_excludes='', $external_ua_string=
 	if ( !$a_engine_data ) {
 		$a_engine_data = array( $layout_engine, $layout_engine_nu_full, $layout_engine_nu );
 	}
+	if ( !$a_blink_data ) {
+		$a_blink_data = array( $blink_type, $blink_type_number, $browser_number );
+	}
 	if ( !$a_khtml_data ) {
 		$a_khtml_data = array( $khtml_type, $khtml_type_number, $browser_number );
 	}
 	if ( !$a_moz_data ) {
 		$a_moz_data = array( $moz_type, $moz_type_number, $moz_rv, $moz_rv_full, $moz_release_date );
 	}
-	if ( !$a_webkit_data ) {
-		$a_webkit_data = array( $webkit_type, $webkit_type_number, $browser_number );
-	}
 	if ( !$a_trident_data ) {
 		$a_trident_data = array( $trident_type, $trident_type_number, $layout_engine_nu, $browser_number );
+	}
+	if ( !$a_webkit_data ) {
+		$a_webkit_data = array( $webkit_type, $webkit_type_number, $browser_number );
 	}
 	$run_time = script_time();
 	// now send the actual engine number to the html type function
@@ -945,7 +960,8 @@ function browser_detection( $which_test, $test_excludes='', $external_ua_string=
 			'run_time' => $run_time,
 			'html_type' => $html_type,
 			'engine_data' => $a_engine_data,
-			'trident_data' => $a_trident_data
+			'trident_data' => $a_trident_data,
+			'blink_data' => $a_blink_data
 		);
 	}
 	// return parameters, either full data arrays, or by associative array index key
@@ -971,7 +987,8 @@ function browser_detection( $which_test, $test_excludes='', $external_ua_string=
 				$run_time,
 				$html_type,
 				$a_engine_data,
-				$a_trident_data
+				$a_trident_data,
+				$a_blink_data
 			);
 			// print_r( $a_full_data );
 			return $a_full_data;
