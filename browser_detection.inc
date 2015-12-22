@@ -484,7 +484,7 @@ function browser_detection( $which_test, $test_excludes='', $external_ua_string=
 		Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.<OS build number>
 		edge must come before chrome
 		**/
-		$a_webkit_types = array( 'arora', 'bolt', 'beamrise', 'chromium', 'puffin', 'edge', 'chrome', 'crios', 'dooble', 'epiphany', 'gtklauncher', 'icab', 'konqueror', 'maxthon',  'midori', 'omniweb', 'opera', 'qupzilla', 'rekonq', 'rocketmelt', 'samsungbrowser', 'silk', 'uzbl', 'ucbrowser', 'ucweb', 'shiira', 'sputnik', 'steel', 'teashark', 'safari',  'applewebkit', 'webos', 'xxxterm','vivaldi', 'webkit' );
+		$a_webkit_types = array( 'arora', 'bolt', 'beamrise', 'chromium', 'puffin', 'chrome', 'crios', 'dooble', 'epiphany', 'gtklauncher', 'icab', 'konqueror', 'maxthon',  'midori', 'omniweb', 'opera', 'qupzilla', 'rekonq', 'rocketmelt', 'samsungbrowser', 'silk', 'uzbl', 'ucbrowser', 'ucweb', 'shiira', 'sputnik', 'steel', 'teashark', 'safari',  'applewebkit', 'webos', 'xxxterm','vivaldi', 'webkit' );
 		/**
 		run through the browser_types array, break if you hit a match, if no match, assume old browser
 		or non dom browser, assigns false value to $b_success.
@@ -805,7 +805,8 @@ function browser_detection( $which_test, $test_excludes='', $external_ua_string=
 								else {
 									$browser_name = $a_webkit_types[$j];
 								}
-								if ( $a_webkit_types[$j] == 'chrome' && get_item_math_number( $webkit_type_number ) >= 28  ) {
+								if ( ( $a_webkit_types[$j] == 'chrome' || $a_webkit_types[$j] == 'chromium' ) && 
+								     get_item_math_number( $webkit_type_number ) >= 28  ) {
 									if ( strstr($browser_user_agent, 'blink') ) {
 										$layout_engine_nu_full = get_item_version( $browser_user_agent, 'blink' );
 										$layout_engine_nu = get_item_math_number( $layout_engine_nu_full );
