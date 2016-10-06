@@ -397,6 +397,7 @@ function browser_detection( $which_test, $test_excludes='', $external_ua_string=
 		array( 'exabot', false, 'exabot', 'bot' ),
 		array( 'googlebot', false, 'google', 'bot' ),
 		array( 'google web preview', false, 'googlewp', 'bot' ),
+		array( 'surdotlybot', false, 'surdotlybot', 'bot' ),
 		array( 'yandex', false, 'yandex', 'bot' ),
 		
 		/** then start on ideally 'real' browsers **/
@@ -553,7 +554,6 @@ function browser_detection( $which_test, $test_excludes='', $external_ua_string=
 		array( 'socialrankiobot', false, 'socialrankiobot', 'bot' ),/** http://socialrank.io/about **/
 		array( 'sohu-search', false, 'sohu', 'bot' ),/** chinese media company, search component **/
 		array( 'spbot', false, 'spbot', 'bot' ),
-		array( 'surdotlybot', false, 'surdotlybot', 'bot' ),/** http://sur.ly/bot.html **/
 		array( 'surveybot', false, 'surveybot', 'bot' ),
 		array( 'telegrambot', false, 'telegrambot', 'bot' ),/** TelegramBot (like TwitterBot)  **/
 		array( 'twitterbot', false, 'twitterbot', 'bot' ),/** Twitterbot/1.0  **/
@@ -1787,6 +1787,9 @@ Mozilla/5.0 (en-us) AppleWebKit/525.13 (KHTML, like Gecko; Google Web Preview) V
 --------------------------------------------------------
 Ips-agent (market research, mobile bot):
 Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:14.0; ips-agent) Gecko/20100101 Firefox/14.0.1
+--------------------------------------------------------
+SurdotlyBot:
+Mozilla/5.0 (compatible; SurdotlyBot/1.0; +http://sur.ly/bot.html; Linux; Android 4; iPhone; CPU iPhone OS 6_0_1 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A523 Safari/8536.25
 --------------------------------------------------------
 Yandex bots:
 https://yandex.com/support/webmaster/robot-workings/check-yandex-robots.xml
