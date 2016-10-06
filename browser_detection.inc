@@ -3,8 +3,8 @@
 Script Name: Full Featured PHP Browser/OS detection
 Author: Harald Hope, Website: http://techpatterns.com/
 Script Source URI: http://techpatterns.com/downloads/php_browser_detection.php
-Version: 5.7.2
-Date: 2016-09-12
+Version: 5.8.0
+Date: 2016-10-05
 Copyright (C) 2003-2016
 
 Special thanks to alanjstr for cleaning up the code, especially on function get_item_version(),
@@ -291,7 +291,8 @@ function browser_detection( $which_test, $test_excludes='', $external_ua_string=
 		$b_os_test = true;
 		$b_mobile_test = true;
 		$b_safe_browser = false;
-		$b_success = false;/** boolean for if browser found in main test **/
+		/** boolean for if browser found in main test **/
+		$b_success = false;
 		$blink_type = '';
 		$blink_type_number = '';
 		$browser_math_number = '';
@@ -318,7 +319,8 @@ function browser_detection( $which_test, $test_excludes='', $external_ua_string=
 		$trident_type = '';
 		$trident_type_number = '';
 		$true_ie_number = '';
-		$ua_type = 'bot';/** default to bot since you never know with bots **/
+		/** default to bot since you never know with bots **/
+		$ua_type = 'bot';
 		$webkit_type = '';
 		$webkit_type_number = '';
 		/** set the excludes if required **/
@@ -377,89 +379,25 @@ function browser_detection( $which_test, $test_excludes='', $external_ua_string=
 		/** known browsers, list will be updated routinely, check back now and then **/
 		$a_browser_types = array(
 		/** 
-		Because of search bots now often using regular user agents, this section should be first
-		search engine spider bots because the following search bots use various useragent strings
-		that can contain 'real' user agent data, which would then trigger as a real browser before
-		this detector actually reaches the bot section, so these have to go first:
+		0. Because of search bots now often using regular user agents, this section should be first
+		in the list of useragents because these use various useragent strings that can contain 'real' 
+		user agent data, which would then trigger as a real browser before this detector actually 
+		reaches the bot section.
+		
+		See file comment footer for examples of spoofed mobile etc user agents from these bots:
 		**/
-		/**
-		http://www.botopedia.org/user-agent-list/search-bots/baidu-spider
-		------------
-		Mozilla/5.0 (compatible; Baiduspider/2.0; +http://www.baidu.com/search)
-		Mozilla/5.0 (Linux;u;Android 2.3.7;zh-cn;) AppleWebKit/533.1 (KHTML,like Gecko) Version/4.0 Mobile Safari/533.1 (compatible; +http://www.baidu.com/search/spider.html)
-		Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; rv:1.9.2.8;baidu Transcoder) Gecko/20100722 Firefox/3.6.8 ( .NET CLR 3.5.30729)
-		Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0; baidu Transcoder;)
-		Baiduspider-image+(+http://www.baidu.com/search/spider.htm)
-		Baiduspider+(+http://www.baidu.com/search/spider.htm)
-		Mozilla/5.0 (compatible; Baiduspider/2.0; +http://www.baidu.com/search/spider.html)
-		**/
-		array( 'baidu', false, 'baidu', 'bot' ),/** Baiduspider asian search spider **/
-		/**
-		https://www.bing.com/webmaster/help/which-crawlers-does-bing-use-8c184ec0
-		------------
-		Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)
-		Mozilla/5.0 (iPhone; CPU iPhone OS 7_0 like Mac OS X) AppleWebKit/537.51.1 (KHTML, like Gecko) Version/7.0 Mobile/11A465 Safari/9537.53 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)
-		Mozilla/5.0 (Windows Phone 8.1; ARM; Trident/7.0; Touch; rv:11.0; IEMobile/11.0; NOKIA
-		msnbot/2.0b (+http://search.msn.com/msnbot.htm)
-		msnbot-media/1.1 (+http://search.msn.com/msnbot.htm)
-		Mozilla/5.0 (compatible; adidxbot/2.0; +http://www.bing.com/bingbot.htm)
-		Mozilla/5.0 (iPhone; CPU iPhone OS 7_0 like Mac OS X) AppleWebKit/537.51.1 (KHTML, like Gecko) Version/7.0 Mobile/11A465 Safari/9537.53 (compatible; adidxbot/2.0; +http://www.bing.com/bingbot.htm)
-		Mozilla/5.0 (Windows Phone 8.1; ARM; Trident/7.0; Touch; rv:11.0; IEMobile/11.0; NOKIA; Lumia 530) like Gecko (compatible; adidxbot/2.0; +http://www.bing.com/bingbot.htm)
-		Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/534+ (KHTML, like Gecko) BingPreview/1.0b
-		Mozilla/5.0 (Windows Phone 8.1; ARM; Trident/7.0; Touch; rv:11.0; IEMobile/11.0; NOKIA; Lumia 530) like Gecko BingPreview/1.0b
-		**/
-		array( 'bingbot', false, 'bing', 'bot' ),/** bing, mobile with fake ua  **/
-		array( 'bingpreview', false, 'bing', 'bot' ),/** bing preview  **/
-		array( 'msnbot', false, 'msn', 'bot' ),/** msn search **/
-		/**
-		Mozilla/5.0 (compatible; Konqueror/3.5; Linux) KHTML/3.5.5 (like Gecko) (Exabot-Thumbnails)
-		Mozilla/5.0 (compatible; Exabot/3.0; +http://www.exabot.com/go/robot)
-		**/
-		array( 'exabot', false, 'exabot', 'bot' ),/** exabot, fake real ua **/
-		/**
-		Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)
-		Googlebot/2.1 (+http://www.google.com/bot.html)
-		Googlebot-News
-		Googlebot-Image/1.0
-		Googlebot-Video/1.0
-		SAMSUNG-SGH-E250/1.0 Profile/MIDP-2.0 Configuration/CLDC-1.1 UP.Browser/6.2.3.3.c.1.101 (GUI) MMP/2.0 (compatible; Googlebot-Mobile/2.1; +http://www.google.com/bot.html)
-		DoCoMo/2.0 N905i(c100;TB;W24H16) (compatible; Googlebot-Mobile/2.1; +http://www.google.com/bot.html)
-		Mozilla/5.0 (Linux; Android 6.0.1; Nexus 5X Build/MMB29P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.96 Mobile Safari/537.36 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)
-		(compatible; Mediapartners-Google/2.1; +http://www.google.com/bot.html)
-		Mediapartners-Google
-		AdsBot-Google (+http://www.google.com/adsbot.html)
-		AdsBot-Google-Mobile-Apps
-		**/
-		array( 'googlebot', false, 'google', 'bot' ),/** google **/
-		/** Mozilla/5.0 (en-us) AppleWebKit/525.13 (KHTML, like Gecko; Google Web Preview) Version/3.1 Safari/525.13  **/
-		array( 'google web preview', false, 'googlewp', 'bot' ),/** google preview, fake real ua  **/
-		/**
-		https://yandex.com/support/webmaster/robot-workings/check-yandex-robots.xml
-		------------
-		Mozilla/5.0 (compatible; YandexBot/3.0; +http://yandex.com/bots)
-		Mozilla/5.0 (iPhone; CPU iPhone OS 8_1 like Mac OS X) AppleWebKit/600.1.4 (KHTML, like Gecko) Version/8.0 Mobile/12B411 Safari/600.1.4 (compatible; YandexBot/3.0; +http://yandex.com/bots)
-		Mozilla/5.0 (compatible; YandexAccessibilityBot/3.0; +http://yandex.com/bots)
-		Mozilla/5.0 (iPhone; CPU iPhone OS 8_1 like Mac OS X) AppleWebKit/600.1.4 (KHTML, like Gecko) Version/8.0 Mobile/12B411 Safari/600.1.4 (compatible; YandexMobileBot/3.0; +http://yandex.com/bots)
-		Mozilla/5.0 (compatible; YandexDirectDyn/1.0; +http://yandex.com/bots)
-		Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36 (compatible; YandexScreenshotBot/3.0; +http://yandex.com/bots)
-		Mozilla/5.0 (compatible; YandexImages/3.0; +http://yandex.com/bots)
-		Mozilla/5.0 (compatible; YandexVideo/3.0; +http://yandex.com/bots)
-		Mozilla/5.0 (compatible; YandexVideoParser/1.0; +http://yandex.com/bots)
-		Mozilla/5.0 (compatible; YandexMedia/3.0; +http://yandex.com/bots)
-		Mozilla/5.0 (compatible; YandexBlogs/0.99; robot; +http://yandex.com/bots)
-		Mozilla/5.0 (compatible; YandexFavicons/1.0; +http://yandex.com/bots)
-		Mozilla/5.0 (compatible; YandexWebmaster/2.0; +http://yandex.com/bots)
-		Mozilla/5.0 (compatible; YandexPagechecker/1.0; +http://yandex.com/bots)
-		Mozilla/5.0 (compatible; YandexImageResizer/2.0; +http://yandex.com/bots)
-		Mozilla/5.0 (compatible; YaDirectFetcher/1.0; Dyatel; +http://yandex.com/bots)
-		Mozilla/5.0 (compatible; YandexCalendar/1.0; +http://yandex.com/bots)
-		Mozilla/5.0 (compatible; YandexSitelinks; Dyatel; +http://yandex.com/bots)
-		Mozilla/5.0 (compatible; YandexMetrika/2.0; +http://yandex.com/bots)
-		Mozilla/5.0 (compatible; YandexAntivirus/2.0; +http://yandex.com/bots)
-		Mozilla/5.0 (compatible; YandexVertis/3.0; +http://yandex.com/bots)
-		Mozilla/5.0 (compatible; YandexBot/3.0; MirrorDetector; +http://yandex.com/bots)
-		**/
-		array( 'yandex', false, 'yandex', 'bot' ),/** yandex.com - covers YandexMobileBot as well **/
+		array( '360spider', false, '360spider', 'bot' ),
+		array( 'adsbot-google', false, 'google-ads', 'bot' ),
+		array( 'applebot', false, 'applebot', 'bot' ),
+		array( 'baidu', false, 'baidu', 'bot' ),
+		array( 'bingbot', false, 'bing', 'bot' ),
+		array( 'bingpreview', false, 'bing', 'bot' ),
+		array( 'ips-agent', false, 'ips-agent', 'bot' ),
+		array( 'msnbot', false, 'msn', 'bot' ),
+		array( 'exabot', false, 'exabot', 'bot' ),
+		array( 'googlebot', false, 'google', 'bot' ),
+		array( 'google web preview', false, 'googlewp', 'bot' ),
+		array( 'yandex', false, 'yandex', 'bot' ),
 		
 		/** then start on ideally 'real' browsers **/
 		array( 'edge', true, 'edge', 'bro' ),
@@ -496,73 +434,132 @@ function browser_detection( $which_test, $test_excludes='', $external_ua_string=
 		array( 'crazy browser', true, 'ie', 'bro' ),/**  uses ie rendering engine **/
 		
 		/**  
-		misc bots. Note that these should be rechecked to make sure their user agents
-		don't contain standard browser ua data
+		Miscellaneous Bots. Always make sure that bots do not contain standard UA 
+		syntax, if they do, move them up above to 0. bot section.
+		
+		1: misc catchalls - use first to avoid extra looping. See comment footer for examples. 
 		**/
-		array( 'adsbot-google', false, 'google-ads', 'bot' ),/** google adsense/adwords **/
-		array( 'answerbus', false, 'answerbus', 'bot' ),/** http://www.answerbus.com/, web questions **/
+		array( ' bot', false, 'misc-bot', 'bot' ), 
+		array( '-bot', false, 'misc-bot', 'bot' ), 
+		array( '_bot', false, 'misc-bot', 'bot' ), 
+		array( 'crawl', false, 'misc-bot', 'bot' ), 
+		array( 'download', false, 'misc-dow', 'dow' ),
+		array( 'fetch', false, 'misc-dow', 'dow' ),
+		array( 'link', false, 'misc-bot', 'bot' ),
+		array( 'robot', false, 'misc-bot', 'bot' ),
+		array( 'scanner', false, 'misc-bot', 'bot' ),
+		array( 'scrape', false, 'misc-bot', 'bot' ),
+		array( 'seobot', false, 'misc-bot', 'bot' ),
+		array( 'seo ', false, 'misc-bot', 'bot' ),
+		array( 'seo_', false, 'misc-bot', 'bot' ),
+		array( 'seo-', false, 'misc-bot', 'bot' ),
+		array( 'sitemap', false, 'misc-bot', 'bot' ),
+		array( 'spider', false, 'misc-bot', 'bot' ),
+		array( 'webbot', false, 'misc-bot', 'bot' ),
+		array( 'http client', false, 'httpclient', 'lib' ),
+		array( 'http-client', false, 'httpclient', 'lib' ),
+		array( 'http_client', false, 'httpclient', 'lib' ),
+		array( 'httpclient', false, 'httpclient', 'lib' ),
+		array( 'http_request', false, 'httprequest', 'lib' ),
+		array( 'http-request', false, 'httprequest', 'lib' ),
+		array( 'httprequest', false, 'httprequest', 'lib' ),
+		array( 'http_transport', false, 'httptransport', 'lib' ),
+		array( 'http-transport', false, 'httptransport', 'lib' ),
+		array( 'httptransport', false, 'httptransport', 'lib' ),
+		array( 'java', false, 'java', 'lib' ),
+		array( 'php-', false, 'php', 'lib' ),
+		array( 'perl', false, 'perl', 'lib' ),
+		array( 'python', false, 'python', 'lib' ),
+		array( 'ruby', false, 'ruby', 'lib' ),
+		
+		/** 2. bots by unique id **/
+		array( '8leg', false, '8leg', 'bot' ),
+		array( 'ahrefsbot', false, 'ahrefsbot', 'bot' ),
+		array( 'alexa', false, 'alexa', 'bot' ),/** http://www.alexa.com/help/webmasters **/
 		array( 'almaden', false, 'ibm', 'bot' ),/** ibm almaden web crawler **/
+		array( 'answerbus', false, 'answerbus', 'bot' ),/** http://www.answerbus.com/, web questions **/
+		array( 'archive.org', false, 'archive.org', 'bot' ),/**archive.org **/
 		array( 'ask jeeves', false, 'ask', 'bot' ),/** jeeves/teoma **/
 		array( 'teoma', false, 'ask', 'bot' ),/** jeeves teoma - leave in this order **/
+		/** end teomo **/
+		array( 'betabot', false, 'betabot', 'bot' ),
+		array( 'blexbot', false, 'blexbot', 'bot' ),
 		array( 'bpimagewalker', false, 'bp-imagewalker', 'bot' ),/** bdbrandprotect.com **/
 		array( 'bhcbot', false, 'bhcbot', 'bot' ),/** ovh.com  **/
 		array( 'boitho.com-dc', false, 'boitho', 'bot' ),/** norwegian search engine **/
-		array( 'comodospider', false, 'comodospider', 'bot' ),
-		array( 'domainsigmacrawler', false, 'domainsigmacrawler', 'bot' ),
+		array( 'catexplorador', false, 'catexplorador', 'bot' ),
+		array( 'checkmark', false, 'checkmark', 'bot' ),
+		array( 'clockwork data', false, 'clockwork-data', 'bot' ),/** Clockwork Data Vault **/
+		array( 'coccoc', false, 'coccoc', 'bot' ),/** vietnamese se: +http://help.coccoc.com/searchengine **/
+		array( 'docomo', false, 'docomo', 'bot' ),/** ua: DoCoMo/2.0 **/
+		array( 'domainreanimator', false, 'domainreanimator', 'bot' ),
+		array( 'domainstatsbot', false, 'domainstatsbot', 'bot' ),
 		array( 'dotbot', false, 'dotbot', 'bot' ),/** http://www.opensiteexplorer.org/dotbot **/
 		array( 'downnotifier', false, 'downnotifier', 'bot' ),/** downnotifier.com **/
+		array( 'ez publish', false, 'ez-publish', 'bot' ),/** ua:  eZ Publish Link Validator **/
+		array( 'exabot', false, 'exabot', 'bot' ),/** dassault owned, french? search, exalead.com **/
+		array( 'experibot', false, 'experibot', 'bot' ),/**  **/
+		array( 'ezooms', false, 'ezooms', 'bot' ),/** SEO Moz? alt for dotbot: http://www.opensiteexplorer.org/dotbot **/
 		array( 'facebookexternalhit', false, 'facebook', 'bot' ),
 		array( 'facebot', false, 'facebook', 'bot' ),
-		array( 'fast-webcrawler', false, 'fast', 'bot' ),/** Fast AllTheWeb **/
 		array( 'fatbot', false, 'fatbot', 'bot' ),/** http://www.thefind.com/crawler **/
-		array( 'gigabot', false, 'gigabot', 'bot' ),/** gigabot crawler **/
+		array( 'findxbot', false, 'findxbook', 'bot' ),
+		array( 'gigabot', false, 'gigabot', 'bot' ),/** open source search engine: gigabot crawler **/
 		array( 'googledocs', false, 'google-docs', 'bot' ),/** http://docs.google.com **/
 		array( 'gozaikbot', false, 'gozaikbot', 'bot' ),/** joined with monster; www.gozaik.com/gozaikbot.html **/
+		array( 'grammarly', false, 'grammarly', 'bot' ),
+		array( 'guardcrwlr', false, 'guardcrwlr', 'bot' ),
 		array( 'headmasterseo', false, 'headmasterseo', 'bot' ),
 		array( 'hosttracker', false, 'hosttracker', 'bot' ),/** uptime checker, host-tracker.com **/
+		array( 'hubspot', false, 'hubspot', 'bot' ),/** HubSpot Links Crawler **/
 		array( 'hybridbot', false, 'hybridbot', 'bot' ),/** russian ad bot: hybrid.ru/about **/
 		array( 'ia_archiver', false, 'ia_archiver', 'bot' ),/** ia archiver **/
-		array( 'icc-crawler', false, 'icc-crawler', 'bot' ),/** http://www.nict.go.jp/en/ucri/plan/crawl.html **/
 		array( 'iltrovatore-setaccio', false, 'il-set', 'bot' ),
 		array( 'imagewalker', false, 'imagewalker', 'bot' ),/** bdbrandprotect.com **/
+		array( 'istellabot', false, 'istellabot', 'bot' ),/** italian search engine **/
+		array( 'kocmohabt', false, 'kocmohabt', 'bot' ),
 		array( 'lexxebotr', false, 'lexxebotr', 'bot' ),
-		/**
-		Mozilla/5.0 (textmode; U; Linux i386; en-US; rv:3.0.110.0) Gecko/20101006 EzineArticlesLinkScanner/3.0.0g
-		**/
-		array( 'linkscanner', false, 'linkscanner', 'bot' ),/** EzineArticlesLinkScanner **/
-		array( 'linkwalker', false, 'linkwalker', 'bot' ),/** bdbrandprotect.com **/
-		array( 'magpie-crawler', false, 'magpie-crawler', 'bot' ),/** brandwatch.net **/
+		array( 'ltx71', false, 'ltx71', 'bot' ),/** ltx71 - (http://ltx71.com/) **/
+		array( 'mail.ru_bot', false, 'mail.ru_bot', 'bot' ),/** brandwatch.net **/
 		array( 'mediapartners-google', false, 'adsense', 'bot' ),/** google adsense **/
-		/** Mozilla/5.0 (compatible; MJ12bot/v1.4.5; http://www.majestic12.co.uk/bot.php?+) **/
-		array( 'mj12bot', false, 'mj12bot', 'bot' ),/** majestic12.co.uk **/
+		array( 'mj12bot', false, 'mj12bot', 'bot' ),/** search bot: majestic12.co.uk **/
 		array( 'naverbot', false, 'naverbot', 'bot' ),/** naverbot crawler, bad bot, block **/
-		/** ObjectsSearch/0.2 (ObjectsSearch; http://www.ObjectsSearch.com/bot.html; support@thesoftwareobjects.com)  **/
+		array( 'nutch', false, 'nutch', 'bot' ),/** apache: Nutch/2.2.1 **/
 		array( 'objectssearch', false, 'objectsearch', 'bot' ),/** open source search engine **/
 		array( 'omgilibot', false, 'omgilibot', 'bot' ),
 		array( 'openbot', false, 'openbot', 'bot' ),/** openbot, from taiwan **/
+		array( 'paperlibot', false, 'paperlibot', 'bot' ),/** http://support.paper.li **/
+		array( 'pingdom', false, 'pingdom', 'bot' ),
 		array( 'pinterest', false, 'pinterest', 'bot' ),/** www.pinterest.com **/
-		
 		array( 'primalbot', false, 'primalbot', 'bot' ),/** https://www.primal.com **/
+		array( 'proximic', false, 'proximic', 'bot' ),/** http://www.proximic.com/info/spider.php **/
 		array( 'psbot', false, 'psbot', 'bot' ),/** psbot image crawler **/
+		array( 'pulsepoint', false, 'pulsepoint', 'bot' ),
+		array( 'qwantify', false, 'qwantify', 'bot' ),/** Qwantify/1.0 **/
+		array( 'rankvalbot', false, 'rankvalbot', 'bot' ),
 		array( 'redback', false, 'redback', 'bot' ),/** ruby spider: https://github.com/robmiller/redback **/
+		array( 'safednsbot', false, 'safednsbot', 'bot' ),/** safednsbot **/
+		array( 'salesintelligent', false, 'salesintelligent', 'bot' ),
 		array( 'scooter', false, 'scooter', 'bot' ),/** altavista **/
-		array( 'seoscanners', false, 'seoscanners', 'bot' ),/** seoscanners.net/ **/
+		array( 'scrapy', false, 'scrapy', 'bot' ),
+		array( 'searchie', false, 'searchiet', 'bot' ),/** ua: Searchie/1.0 **/
+		array( 'semrushbot', false, 'semrushbot', 'bot' ),/** semrush.com/bot.html **/
+		array( 'seokicks', false, 'seokicks', 'bot' ),
+		array( 'seobilitybot', false, 'seobilitybot', 'bot' ),/** SeobilityBot (SEO-Check; **/
+		array( 'seznambot', false, 'seznambot', 'bot' ),/** http://napoveda.seznam.cz/en/seznambot-intro/ **/
 		array( 'slackbot', false, 'slackbot', 'bot' ),/** https://api.slack.com/robots **/
 		array( 'slack.com', false, 'slackbot', 'bot' ),/** https://api.slack.com/robots **/
 		array( 'sogou', false, 'sogou', 'bot' ),/** asian bot **/
-		array( 'sosospider', false, 'sosospider', 'bot' ),/** http://help.soso.com/webspider.htm **/
+		array( 'socialrankiobot', false, 'socialrankiobot', 'bot' ),/** http://socialrank.io/about **/
 		array( 'sohu-search', false, 'sohu', 'bot' ),/** chinese media company, search component **/
-		/** Mozilla/5.0 (compatible; SurdotlyBot/1.0; +http://sur.ly/bot.html) **/
+		array( 'spbot', false, 'spbot', 'bot' ),
 		array( 'surdotlybot', false, 'surdotlybot', 'bot' ),/** http://sur.ly/bot.html **/
 		array( 'surveybot', false, 'surveybot', 'bot' ),
-		array( 'switescraper', false, 'switescraper', 'bot' ),/** article scraper **/
-		array( 'uxcrawlerbot', false, 'uxcrawlerbot', 'bot' ),/** telentia.com  **/
+		array( 'telegrambot', false, 'telegrambot', 'bot' ),/** TelegramBot (like TwitterBot)  **/
+		array( 'twitterbot', false, 'twitterbot', 'bot' ),/** Twitterbot/1.0  **/
 		array( 'vbseo', false, 'vbseo', 'bot' ),
-		array( 'vegi bot', false, 'vegi-bot', 'bot' ),
 		array( 'xenu', false, 'xenu', 'bot' ),
-		/**
-		Mozilla/5.0 (compatible; Yahoo Link Preview; https://help.yahoo.com/kb/mail/yahoo-link-preview-SLN23615.html
-		**/
+		array( 'youdaobot', false, 'youdaobot', 'bot' ),
 		/** leave the yahoo/slurp bots in this order to get right detections **/
 		array( 'yahoo link preview', false, 'yahoo-preview', 'bot' ),/** 2016 yahoo link preview bot **/
 		array( 'yahoo-verticalcrawler', false, 'yahoo', 'bot' ),/** old yahoo bot **/
@@ -572,24 +569,27 @@ function browser_detection( $which_test, $test_excludes='', $external_ua_string=
 		array( 'yahoo-mm', false, 'yahoomm', 'bot' ),/** gets Yahoo-MMCrawler and Yahoo-MMAudVid bots **/
 		array( 'zyborg', false, 'looksmart', 'bot' ),/** looksmart **/
 		
-		/** various http utility libaries **/
+		/** 3. various http utility libaries **/
 		array( 'ahc', false, 'ahc', 'lib' ),/** ua: AHC/2.0 info: java http: Async Http Client **/
+		array( 'anyevent-http', false, 'anyevent-http', 'lib' ),/** perl AnyEvent-HTTP **/
+		array( 'go 1', false, 'go-http', 'lib' ),/** ua: Go 1.1 package http **/
 		array( 'w3c_validator', false, 'w3c', 'lib' ), /** uses libperl, make first **/
 		array( 'wdg_validator', false, 'wdg', 'lib' ), 
-		array( 'libwww-perl', false, 'libwww-perl', 'lib' ),
-		array( 'jakarta commons-httpclient', false, 'jakarta', 'lib' ),
-		array( 'java', false, 'java', 'lib' ),/** ua: Java/1.6.0_26 **/
+		array( 'google-http', false, 'google-http', 'lib' ),/** Google-HTTP-Java-Client **/
 		array( 'okhttp', false, 'okhttp', 'lib' ),/** ua: okhttp/3.4.1 **/
-		array( 'python-urllib', false, 'python-urllib', 'lib' ),
-		array( 'ruby', false, 'ruby', 'lib' ),/** ua: Ruby **/
+		array( 'pcore', false, 'pcore-http', 'lib' ),/** perl: Pcore-HTTP/v0.24.5 **/
+		array( 'pear http', false, 'pear', 'lib' ),
 		array( 'winhttp', false, 'winhttp', 'lib' ),/** ua: WinHTTP **/
+		array( 'wordpress', false, 'winhttp', 'lib' ),/** ua: WordPress/4.6.1; **/
+		array( 'zgrab', false, 'zgrab', 'lib' ),/** Go lang lib: ua:Mozilla/5.0 zgrab/0.x **/
 		
-		/** download apps **/
-		array( 'curl', false, 'curl', 'dow' ),/** standard download program in nix **/
-		array( 'favicon downloader', false, 'favicon-downloader', 'dow' ),/** http://favicon.netk6.com **/
-		array( 'guzzle', false, 'guzzle', 'dow' ), /** php downloader: UA: Guzzle/5.3.0 **/
+		/** 4. download programs **/
+		array( 'curl', false, 'curl', 'dow' ),
+		array( 'guzzle', false, 'guzzle', 'dow' ),
 		array( 'getright', false, 'getright', 'dow' ),
-		array( 'wget', false, 'wget', 'dow' ),/** standard download program in nix **/
+		array( 'pagefreezer', false, 'pagefreezer', 'dow' ),
+		array( 'wget', false, 'wget', 'dow' ),
+		array( 'zgrab', false, 'zgrab', 'dow' ),
 		
 		/** netscape 4 and earlier tests, put last so spiders don't get caught **/
 		array( 'mozilla/4.', false, 'ns', 'bbro' ),
@@ -601,7 +601,8 @@ function browser_detection( $which_test, $test_excludes='', $external_ua_string=
 		note: not using this because chrome < 28 = webkit, >=28 == blink, so can't do normal handling
 		for now doing a case by case for layout engine
 		**/
-		$a_blink_types = array('opr/', 'vivaldi', 'chromium', 'chrome', 'blink');
+		$a_blink_types = array('opr/', 'otter', 'qupzilla', 'slimjet', 'vivaldi', 'chromium', 
+		'chrome', 'blink');
 		/**
 		moz types array
 		note the order, netscape6 must come before netscape, which  is how netscape 7 id's itself.
@@ -632,9 +633,9 @@ function browser_detection( $which_test, $test_excludes='', $external_ua_string=
 		**/
 		$a_webkit_types = array( 'arora', 'bolt', 'beamrise', 'chromium', 'puffin', 'chrome', 
 		'crios', 'dooble', 'epiphany', 'gtklauncher', 'icab', 'konqueror', 'maxthon',  'midori', 
-		'omniweb', 'opera', 'qupzilla', 'rekonq', 'rocketmelt', 'samsungbrowser', 'silk', 'uzbl', 
-		'ucbrowser', 'ucweb', 'shiira', 'sputnik', 'steel', 'teashark', 'safari',  'applewebkit', 
-		'webos', 'xxxterm','vivaldi', 'yabrowser', 'webkit' );
+		'omniweb', 'opera', 'otter', 'qupzilla', 'rekonq', 'rocketmelt', 'samsungbrowser', 'silk', 'uzbl', 
+		'ucbrowser', 'ucweb', 'shiira', 'sputnik', 'steel', 'teashark', 'safari',  'slimboat', 
+		'applewebkit', 'webos', 'xxxterm','vivaldi', 'yabrowser', 'webkit' );
 		/**
 		run through the browser_types array, break if you hit a match, if no match, assume old browser
 		or non dom browser, assigns false value to $b_success.
@@ -1726,6 +1727,171 @@ function script_time()
 }
 
 /**
+--------------------------------------------------------
+BOTS MIMICKING REAL BROWSERS/MOBILES:
+--------------------------------------------------------
+360Spider:
+Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0); 360Spider
+--------------------------------------------------------
+Applebots (http://www.apple.com/go/applebot):
+Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/600.2.5 (KHTML, like Gecko) Version/8.0.2 Safari/600.2.5 (Applebot/0.1; +http://www.apple.com/go/applebot)
+--------------------------------------------------------
+Baidu bots (Baiduspider asian search spider):
+http://www.botopedia.org/user-agent-list/search-bots/baidu-spider
+------------
+Mozilla/5.0 (compatible; Baiduspider/2.0; +http://www.baidu.com/search)
+Mozilla/5.0 (Linux;u;Android 2.3.7;zh-cn;) AppleWebKit/533.1 (KHTML,like Gecko) Version/4.0 Mobile Safari/533.1 (compatible; +http://www.baidu.com/search/spider.html)
+Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; rv:1.9.2.8;baidu Transcoder) Gecko/20100722 Firefox/3.6.8 ( .NET CLR 3.5.30729)
+Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0; baidu Transcoder;)
+Baiduspider-image+(+http://www.baidu.com/search/spider.htm)
+Baiduspider+(+http://www.baidu.com/search/spider.htm)
+Mozilla/5.0 (compatible; Baiduspider/2.0; +http://www.baidu.com/search/spider.html)
+--------------------------------------------------------
+Bing bots:
+https://www.bing.com/webmaster/help/which-crawlers-does-bing-use-8c184ec0
+------------
+Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)
+Mozilla/5.0 (iPhone; CPU iPhone OS 7_0 like Mac OS X) AppleWebKit/537.51.1 (KHTML, like Gecko) Version/7.0 Mobile/11A465 Safari/9537.53 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)
+Mozilla/5.0 (Windows Phone 8.1; ARM; Trident/7.0; Touch; rv:11.0; IEMobile/11.0; NOKIA
+msnbot/2.0b (+http://search.msn.com/msnbot.htm)
+msnbot-media/1.1 (+http://search.msn.com/msnbot.htm)
+Mozilla/5.0 (compatible; adidxbot/2.0; +http://www.bing.com/bingbot.htm)
+Mozilla/5.0 (iPhone; CPU iPhone OS 7_0 like Mac OS X) AppleWebKit/537.51.1 (KHTML, like Gecko) Version/7.0 Mobile/11A465 Safari/9537.53 (compatible; adidxbot/2.0; +http://www.bing.com/bingbot.htm)
+Mozilla/5.0 (Windows Phone 8.1; ARM; Trident/7.0; Touch; rv:11.0; IEMobile/11.0; NOKIA; Lumia 530) like Gecko (compatible; adidxbot/2.0; +http://www.bing.com/bingbot.htm)
+Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/534+ (KHTML, like Gecko) BingPreview/1.0b
+Mozilla/5.0 (Windows Phone 8.1; ARM; Trident/7.0; Touch; rv:11.0; IEMobile/11.0; NOKIA; Lumia 530) like Gecko BingPreview/1.0b
+--------------------------------------------------------
+Exabot:
+Mozilla/5.0 (compatible; Konqueror/3.5; Linux) KHTML/3.5.5 (like Gecko) (Exabot-Thumbnails)
+Mozilla/5.0 (compatible; Exabot/3.0; +http://www.exabot.com/go/robot)
+--------------------------------------------------------
+Google Ads Bot (google adsense/adwords):
+Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1 (compatible; AdsBot-Google-Mobile; +http://www.google.com/mobile/adsbot.html)
+--------------------------------------------------------
+Google Bots:
+Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)
+Googlebot/2.1 (+http://www.google.com/bot.html)
+Googlebot-News
+Googlebot-Image/1.0
+Googlebot-Video/1.0
+SAMSUNG-SGH-E250/1.0 Profile/MIDP-2.0 Configuration/CLDC-1.1 UP.Browser/6.2.3.3.c.1.101 (GUI) MMP/2.0 (compatible; Googlebot-Mobile/2.1; +http://www.google.com/bot.html)
+DoCoMo/2.0 N905i(c100;TB;W24H16) (compatible; Googlebot-Mobile/2.1; +http://www.google.com/bot.html)
+Mozilla/5.0 (Linux; Android 6.0.1; Nexus 5X Build/MMB29P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.96 Mobile Safari/537.36 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)
+(compatible; Mediapartners-Google/2.1; +http://www.google.com/bot.html)
+Mediapartners-Google
+AdsBot-Google (+http://www.google.com/adsbot.html)
+AdsBot-Google-Mobile-Apps
+--------------------------------------------------------
+Google web preview:
+Mozilla/5.0 (en-us) AppleWebKit/525.13 (KHTML, like Gecko; Google Web Preview) Version/3.1 Safari/525.13
+--------------------------------------------------------
+Ips-agent (market research, mobile bot):
+Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:14.0; ips-agent) Gecko/20100101 Firefox/14.0.1
+--------------------------------------------------------
+Yandex bots:
+https://yandex.com/support/webmaster/robot-workings/check-yandex-robots.xml
+------------
+Mozilla/5.0 (compatible; YandexBot/3.0; +http://yandex.com/bots)
+Mozilla/5.0 (iPhone; CPU iPhone OS 8_1 like Mac OS X) AppleWebKit/600.1.4 (KHTML, like Gecko) Version/8.0 Mobile/12B411 Safari/600.1.4 (compatible; YandexBot/3.0; +http://yandex.com/bots)
+Mozilla/5.0 (compatible; YandexAccessibilityBot/3.0; +http://yandex.com/bots)
+Mozilla/5.0 (iPhone; CPU iPhone OS 8_1 like Mac OS X) AppleWebKit/600.1.4 (KHTML, like Gecko) Version/8.0 Mobile/12B411 Safari/600.1.4 (compatible; YandexMobileBot/3.0; +http://yandex.com/bots)
+Mozilla/5.0 (compatible; YandexDirectDyn/1.0; +http://yandex.com/bots)
+Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36 (compatible; YandexScreenshotBot/3.0; +http://yandex.com/bots)
+Mozilla/5.0 (compatible; YandexImages/3.0; +http://yandex.com/bots)
+Mozilla/5.0 (compatible; YandexVideo/3.0; +http://yandex.com/bots)
+Mozilla/5.0 (compatible; YandexVideoParser/1.0; +http://yandex.com/bots)
+Mozilla/5.0 (compatible; YandexMedia/3.0; +http://yandex.com/bots)
+Mozilla/5.0 (compatible; YandexBlogs/0.99; robot; +http://yandex.com/bots)
+Mozilla/5.0 (compatible; YandexFavicons/1.0; +http://yandex.com/bots)
+Mozilla/5.0 (compatible; YandexWebmaster/2.0; +http://yandex.com/bots)
+Mozilla/5.0 (compatible; YandexPagechecker/1.0; +http://yandex.com/bots)
+Mozilla/5.0 (compatible; YandexImageResizer/2.0; +http://yandex.com/bots)
+Mozilla/5.0 (compatible; YaDirectFetcher/1.0; Dyatel; +http://yandex.com/bots)
+Mozilla/5.0 (compatible; YandexCalendar/1.0; +http://yandex.com/bots)
+Mozilla/5.0 (compatible; YandexSitelinks; Dyatel; +http://yandex.com/bots)
+Mozilla/5.0 (compatible; YandexMetrika/2.0; +http://yandex.com/bots)
+Mozilla/5.0 (compatible; YandexAntivirus/2.0; +http://yandex.com/bots)
+Mozilla/5.0 (compatible; YandexVertis/3.0; +http://yandex.com/bots)
+Mozilla/5.0 (compatible; YandexBot/3.0; MirrorDetector; +http://yandex.com/bots)
+
+--------------------------------------------------------
+CATCHALL BOT TYPES (basically wild card searches, be careful with these!):
+--------------------------------------------------------
+' bot':
+vegi bot;
+--------------------
+crawl:
+icc-crawler; webmeup-crawler; commoncrawler; crazywebcrawler; domainsigmacrawler; fast-webcrawler 
+magpie-crawler (brandwatch.net); uxcrawlerbot (telentia.com)
+PageFreezer (pagefreezer crawler; http://pagefreezer
+--------------------
+download:
+favicon-downloader (http://favicon.netk6.com)
+--------------------
+fetch:
+weborama-fetcher; node-fetch
+--------------------
+http-client; http_client; httpclient:
+go-http-client; java http jakarta commons-httpclient apache-httpclient
+--------------------
+http-request; http request; http_request:
+http_requester/0.1; 
+--------------------
+java:
+ua: Java/1.6.0_26
+--------------------
+link:
+link checker;  linkdexbot; linkscanner; link sleuth; linkspammer; linkwalker (bdbrandprotect.com)
+Mozilla/5.0 (textmode; U; Linux i386; en-US; rv:3.0.110.0) Gecko/20101006 EzineArticlesLinkScanner/3.0.0g
+openlink
+--------------------
+perl:
+libwww-perl
+--------------------
+python:
+uas: python-requests/2.11.1; Python-urllib/2.7
+--------------------
+robot:
+NOTE: this will catch all bots that have robots.txt or robot in their link
+TurnitinBot (https://turnitin.com/robot/crawlerinfo.html)
+--------------------
+ruby:
+ua: Ruby
+--------------------
+scanner:
+seoscanners.net/
+--------------------
+scrape:
+switescraper; 
+--------------------
+seo-:
+SeobilityBot (SEO-Check;
+--------------------
+spider:
+uas: YisouSpider; comodospider; SiteLockSpider [en] (WinNT; I ;Nav); sosospider;
+
+--------------------------------------------------------
+BOT SAMPLES:
+--------------------------------------------------------
+Mozilla/5.0 (compatible; AhrefsBot/5.1; +http://ahrefs.com/robot/)
+ObjectsSearch/0.2 (ObjectsSearch; http://www.ObjectsSearch.com/bot.html; support@thesoftwareobjects.com)
+Mozilla/5.0 (compatible; MJ12bot/v1.4.5; http://www.majestic12.co.uk/bot.php?+)
+Mozilla/5.0 (compatible; PaperLiBot/2.1; http://support.paper.li/entries/20023257-what-is-paper-li)
+Mozilla/5.0 (compatible; Pro Sitemaps Generator; https://pro-sitemaps.com) Gecko Pro-Sitemaps/1.0
+Mozilla/5.0 (compatible; SemrushBot/1.1~bl; +http://www.semrush.com/bot.html
+Mozilla/5.0 (compatible; SeznamBot/3.2; +http://napoveda.seznam.cz/en/seznambot-intro/)
+Mozilla/5.0 (compatible; SurdotlyBot/1.0; +http://sur.ly/bot.html)
+Mozilla/5.0 (compatible; Yahoo Link Preview; https://help.yahoo.com/kb/mail/yahoo-link-preview-SLN23615.html
+Mozilla/5.0 (compatible; Yahoo! Slurp; http://help.yahoo.com/help/us/ysearch/slurp)
+--------------------------------------------------------
+Downloaders:
+Guzzle/5.3.0
+PageFreezer (pagefreezer crawler; http://pagefreezer.com/pagefreezer-crawler/; info@pagefreezer.com)
+Mozilla/5.0 zgrab/0.x
+
+--------------------------------------------------------
+GENERIC SAMPLES:
+--------------------------------------------------------
 Here are some navigator.userAgent strings so you can see where the data comes from
 UserAgent Data:
 Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.0; Trident/4.0; User-agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; http://bsalsa.com) ; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.5.30729; .NET CLR 3.0.30618)
