@@ -390,14 +390,15 @@ function browser_detection( $which_test, $test_excludes='', $external_ua_string=
 		array( 'adsbot-google', false, 'google-ads', 'bot' ),
 		array( 'applebot', false, 'applebot', 'bot' ),
 		array( 'baidu', false, 'baidu', 'bot' ),
-		array( 'bingbot', false, 'bing', 'bot' ),
-		array( 'bingpreview', false, 'bing', 'bot' ),
+		array( 'bing', false, 'bing', 'bot' ),
+		array( 'daum', false, 'daum', 'bot' ),
 		array( 'ips-agent', false, 'ips-agent', 'bot' ),
 		array( 'msnbot', false, 'msn', 'bot' ),
 		array( 'exabot', false, 'exabot', 'bot' ),
 		array( 'googlebot', false, 'google', 'bot' ),
 		array( 'google web preview', false, 'googlewp', 'bot' ),
 		array( 'surdotlybot', false, 'surdotlybot', 'bot' ),
+		array( 'surveybot', false, 'surveybot', 'bot' ),
 		array( 'yandex', false, 'yandex', 'bot' ),
 		
 		/** then start on ideally 'real' browsers **/
@@ -440,9 +441,14 @@ function browser_detection( $which_test, $test_excludes='', $external_ua_string=
 		
 		1: misc catchalls - use first to avoid extra looping. See comment footer for examples. 
 		**/
+		array( 'aggregat', false, 'misc-bot', 'bot' ), 
 		array( ' bot', false, 'misc-bot', 'bot' ), 
+		array( 'bot ', false, 'misc-bot', 'bot' ), 
 		array( '-bot', false, 'misc-bot', 'bot' ), 
 		array( '_bot', false, 'misc-bot', 'bot' ), 
+		array( 'bot/', false, 'misc-bot', 'bot' ), 
+		array( 'bot:', false, 'misc-bot', 'bot' ), 
+		array( 'check', false, 'misc-bot', 'bot' ), 
 		array( 'crawl', false, 'misc-bot', 'bot' ), 
 		array( 'download', false, 'misc-dow', 'dow' ),
 		array( 'fetch', false, 'misc-dow', 'dow' ),
@@ -511,6 +517,7 @@ function browser_detection( $which_test, $test_excludes='', $external_ua_string=
 		array( 'grammarly', false, 'grammarly', 'bot' ),
 		array( 'guardcrwlr', false, 'guardcrwlr', 'bot' ),
 		array( 'headmasterseo', false, 'headmasterseo', 'bot' ),
+		array( 'heritrix', false, 'heritrix', 'bot' ),
 		array( 'hosttracker', false, 'hosttracker', 'bot' ),/** uptime checker, host-tracker.com **/
 		array( 'hubspot', false, 'hubspot', 'bot' ),/** HubSpot Links Crawler **/
 		array( 'hybridbot', false, 'hybridbot', 'bot' ),/** russian ad bot: hybrid.ru/about **/
@@ -529,6 +536,7 @@ function browser_detection( $which_test, $test_excludes='', $external_ua_string=
 		array( 'objectssearch', false, 'objectsearch', 'bot' ),/** open source search engine **/
 		array( 'omgilibot', false, 'omgilibot', 'bot' ),
 		array( 'openbot', false, 'openbot', 'bot' ),/** openbot, from taiwan **/
+		array( 'orangebot', false, 'orangebot', 'bot' ),
 		array( 'paperlibot', false, 'paperlibot', 'bot' ),/** http://support.paper.li **/
 		array( 'pingdom', false, 'pingdom', 'bot' ),
 		array( 'pinterest', false, 'pinterest', 'bot' ),/** www.pinterest.com **/
@@ -542,6 +550,7 @@ function browser_detection( $which_test, $test_excludes='', $external_ua_string=
 		array( 'safednsbot', false, 'safednsbot', 'bot' ),/** safednsbot **/
 		array( 'salesintelligent', false, 'salesintelligent', 'bot' ),
 		array( 'scooter', false, 'scooter', 'bot' ),/** altavista **/
+		array( 'scoutjet', false, 'scoutjet', 'bot' ),
 		array( 'scrapy', false, 'scrapy', 'bot' ),
 		array( 'searchie', false, 'searchiet', 'bot' ),/** ua: Searchie/1.0 **/
 		array( 'semrushbot', false, 'semrushbot', 'bot' ),/** semrush.com/bot.html **/
@@ -554,7 +563,6 @@ function browser_detection( $which_test, $test_excludes='', $external_ua_string=
 		array( 'socialrankiobot', false, 'socialrankiobot', 'bot' ),/** http://socialrank.io/about **/
 		array( 'sohu-search', false, 'sohu', 'bot' ),/** chinese media company, search component **/
 		array( 'spbot', false, 'spbot', 'bot' ),
-		array( 'surveybot', false, 'surveybot', 'bot' ),
 		array( 'telegrambot', false, 'telegrambot', 'bot' ),/** TelegramBot (like TwitterBot)  **/
 		array( 'twitterbot', false, 'twitterbot', 'bot' ),/** Twitterbot/1.0  **/
 		array( 'vbseo', false, 'vbseo', 'bot' ),
@@ -1623,7 +1631,7 @@ function get_mobile_data( $pv_browser_user_agent )
 	using regex (?!mobile) did not work in my tests, not sure why.
 	**/
 	$pattern = '/android[[:space:]]*[4-9]/';
-	if( preg_match( $pattern, $pv_browser_user_agent ) && !stristr($pv_browser_user_agent, 'mobile') ) {
+	if( preg_match( $pattern, $pv_browser_user_agent ) && !strstr($pv_browser_user_agent, 'mobile') ) {
 		$mobile_tablet = 'android tablet';
 	}
 	else {
@@ -1790,6 +1798,9 @@ Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:14.0; ips-agent) Gecko/20100101 Firefox
 --------------------------------------------------------
 SurdotlyBot:
 Mozilla/5.0 (compatible; SurdotlyBot/1.0; +http://sur.ly/bot.html; Linux; Android 4; iPhone; CPU iPhone OS 6_0_1 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A523 Safari/8536.25
+--------------------------------------------------------
+SurveyBot:
+Mozilla/5.0 (Windows; U; Windows NT 5.1; en; rv:1.9.0.13) Gecko/2009073022 Firefox/3.5.2 (.NET CLR 3.5.30729) SurveyBot/2.3 (DomainTools)
 --------------------------------------------------------
 Yandex bots:
 https://yandex.com/support/webmaster/robot-workings/check-yandex-robots.xml
